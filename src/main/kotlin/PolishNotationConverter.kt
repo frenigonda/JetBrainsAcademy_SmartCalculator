@@ -148,7 +148,7 @@ class PolishNotationConverter {
                 s.toBigInteger()
             } catch (e: Exception) {
                 if (memory[s] != null) {
-                    memory[s]!!.toBigInteger()
+                    (memory[s] ?: "").toBigInteger()
                 } else {
                     throw Exception("Unknown variable")
                 }
