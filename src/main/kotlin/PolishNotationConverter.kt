@@ -1,8 +1,8 @@
 import java.math.BigInteger
 
 const val VAR_PATTERN = "^([0-9]+|[a-zA-Z]+)\\z"
-const val OPER2_PATTERN = "^(\\+|-)+\\z"
-const val OPER1_PATTERN = "^(\\*|\\/){1}\\z"
+const val OPER2_PATTERN = "^([+\\-])+\\z"
+const val OPER1_PATTERN = "^([*/])\\z"
 
 class PolishNotationConverter {
     // - when we get a number - output it
@@ -42,10 +42,10 @@ class PolishNotationConverter {
                 stack.add(o)
                 tmpO = ""
             } else if (r2.find(o) != null) {
-                if (o.replace(oldValue = "+", newValue = "").count() % 2 == 0) {
-                    tmpO = "+"
+                tmpO = if (o.replace(oldValue = "+", newValue = "").count() % 2 == 0) {
+                    "+"
                 } else {
-                    tmpO = "-"
+                    "-"
                 }
                 while (stack.isNotEmpty() && (stack.last() == "*" || stack.last() == "/")) {
                     result.add(stack.last())
@@ -159,13 +159,13 @@ class PolishNotationConverter {
         for (e in pnExp) {
             when (e) {
                 "^", "+", "-", "*", "/" -> {
-                    if (stack.count() < 1) { throw Exception("Invalid expression") }
+                    if (stack.isEmpty()) { throw Exception("Invalid expression") }
                     val b = stack.last()
                     stack.removeLast()
                     val a: BigInteger = try {
                         stack.last()
                         stack.removeLast()
-                    } catch (exeption: Exception) {
+                    } catch (exception: Exception) {
                         if (e == "-" || e == "+") {
                             0.toBigInteger()
                         } else {
@@ -176,7 +176,7 @@ class PolishNotationConverter {
                     when (e) {
                         "^" -> {
                             var power: BigInteger = a
-                            var i = 0.toBigInteger()
+                            var i = 1.toBigInteger()
                             while (i < b) {
                                 power *= a
                                 i++

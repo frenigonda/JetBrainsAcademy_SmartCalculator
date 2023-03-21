@@ -1,18 +1,25 @@
 import java.util.Scanner
 
 const val COM_PATTERN = "^/[a-z]*\\z"
-const val NAME_PATTERN = "^(\\s*[a-zA-Z]+\\s*){1}\\z"
+const val NAME_PATTERN = "^[a-zA-Z]+\\z"
+const val BANNED_SYMBOLS = "[^a-zA-Z0-9+\\-*/^=()]"
 
 class Calc {
     fun main() {
         val reader = Scanner(System.`in`)
+        val removeSpaces = "\\s".toRegex()
         while (reader.hasNext()) {
-            val input = reader.nextLine()
+            val input = reader.nextLine().replace(regex = removeSpaces, replacement = "")
             if (input.isEmpty()) { continue }
+
+            if (BANNED_SYMBOLS.toRegex().containsMatchIn(input)) {
+                println("Invalid expression")
+                continue
+            }
 
             when (checkInput(input)) {
                 InputType.HELP -> {
-                    println("The program calculates the sum of numbers")
+                    println("Allowed symbols: 0-9, a-z, A-Z, +, -, *, /, ^, (, ), = and spaces")
                     continue
                 }
                 InputType.UNKNOWN_C -> {
@@ -30,9 +37,6 @@ class Calc {
                         println(e.message)
                     }
                     continue
-                }
-                else -> {
-                    println("Invalid expression")
                 }
             }
         }
@@ -59,7 +63,6 @@ class Calc {
     }
 
     private fun handleInput(input: String) {
-        //(TODO): check for banned symbols
         val expressionParts = input.split("=")
         when (expressionParts.count()) {
             0 -> {
@@ -77,7 +80,7 @@ class Calc {
                 // calculate
                 val res = pnConverter.calculate(pnExp = pnConverter.convert(expressionParts[1]), memory = memory)
                 // assign
-                memory[expressionParts[0].replace("\\s".toRegex(), "")] = res
+                memory[expressionParts[0]] = res
             }
             else -> {
                 // Invalid assignment
